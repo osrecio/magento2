@@ -5,6 +5,9 @@
  */
 namespace Magento\Framework\Backup;
 
+use Magento\Framework\Archive;
+use Magento\Framework\Backup\Filesystem\Iterator\File;
+
 /**
  * Class to work with database backups
  *
@@ -15,14 +18,14 @@ class Db extends AbstractBackup
     /**
      * @var \Magento\Framework\Backup\Db\BackupFactory
      */
-    protected $_backupFactory;
+    protected $backupFactory;
 
     /**
      * @param \Magento\Framework\Backup\Db\BackupFactory $backupFactory
      */
     public function __construct(\Magento\Framework\Backup\Db\BackupFactory $backupFactory)
     {
-        $this->_backupFactory = $backupFactory;
+        $this->backupFactory = $backupFactory;
     }
 
     /**
@@ -35,18 +38,20 @@ class Db extends AbstractBackup
         set_time_limit(0);
         ignore_user_abort(true);
 
-        $this->_lastOperationSucceed = false;
+        $this->lastOperationSucceed = false;
 
-        $archiveManager = new \Magento\Framework\Archive();
+        $archiveManager = new Archive();
         $source = $archiveManager->unpack($this->getBackupPath(), $this->getBackupsDir());
 
-        $file = new \Magento\Framework\Backup\Filesystem\Iterator\File($source);
+        $file = new File($source);
         foreach ($file as $statement) {
             $this->getResourceModel()->runCommand($statement);
         }
-        @unlink($source);
+        if ($this->keepSourceFile()) {
+            @unlink($source);
+        }
 
-        $this->_lastOperationSucceed = true;
+        $this->lastOperationSucceed = true;
 
         return true;
     }
@@ -57,7 +62,7 @@ class Db extends AbstractBackup
      * @param string $line
      * @return bool
      */
-    protected function _isLineLastInCommand($line)
+    protected function isLineLastInCommand($line)
     {
         $cleanLine = trim($line);
         $lineLength = strlen($cleanLine);
@@ -83,9 +88,9 @@ class Db extends AbstractBackup
         set_time_limit(0);
         ignore_user_abort(true);
 
-        $this->_lastOperationSucceed = false;
+        $this->lastOperationSucceed = false;
 
-        $backup = $this->_backupFactory->createBackupModel()->setTime(
+        $backup = $this->backupFactory->createBackupModel()->setTime(
             $this->getTime()
         )->setType(
             $this->getType()
@@ -95,10 +100,10 @@ class Db extends AbstractBackup
             $this->getName()
         );
 
-        $backupDb = $this->_backupFactory->createBackupDbModel();
+        $backupDb = $this->backupFactory->createBackupDbModel();
         $backupDb->createBackup($backup);
 
-        $this->_lastOperationSucceed = true;
+        $this->lastOperationSucceed = true;
 
         return true;
     }
@@ -110,7 +115,7 @@ class Db extends AbstractBackup
      */
     public function getDBSize()
     {
-        $backupDb = $this->_backupFactory->createBackupDbModel();
+        $backupDb = $this->backupFactory->createBackupDbModel();
         return $backupDb->getDBBackupSize();
     }
 

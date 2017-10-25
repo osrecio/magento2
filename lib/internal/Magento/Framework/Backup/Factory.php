@@ -17,7 +17,7 @@ class Factory
      *
      * @var \Magento\Framework\ObjectManagerInterface
      */
-    private $_objectManager;
+    private $objectManager;
 
     /**
      * Backup type constant for database backup
@@ -49,15 +49,15 @@ class Factory
      *
      * @var string[]
      */
-    protected $_allowedTypes;
+    protected $allowedTypes;
 
     /**
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
      */
     public function __construct(\Magento\Framework\ObjectManagerInterface $objectManager)
     {
-        $this->_objectManager = $objectManager;
-        $this->_allowedTypes = [
+        $this->objectManager = $objectManager;
+        $this->allowedTypes = [
             self::TYPE_DB,
             self::TYPE_FILESYSTEM,
             self::TYPE_SYSTEM_SNAPSHOT,
@@ -75,7 +75,7 @@ class Factory
      */
     public function create($type)
     {
-        if (!in_array($type, $this->_allowedTypes)) {
+        if (!in_array($type, $this->allowedTypes)) {
             throw new \Magento\Framework\Exception\LocalizedException(
                 new \Magento\Framework\Phrase(
                     'Current implementation not supported this type (%1) of backup.',
@@ -84,6 +84,6 @@ class Factory
             );
         }
         $class = 'Magento\Framework\Backup\\' . ucfirst($type);
-        return $this->_objectManager->create($class);
+        return $this->objectManager->create($class);
     }
 }

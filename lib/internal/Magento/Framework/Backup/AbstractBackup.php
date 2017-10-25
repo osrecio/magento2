@@ -17,56 +17,62 @@ abstract class AbstractBackup implements BackupInterface
      *
      * @var string
      */
-    protected $_name;
+    protected $name;
 
     /**
      * Backup creation date
      *
      * @var int
      */
-    protected $_time;
+    protected $time;
 
     /**
      * Backup file extension
      *
      * @var string
      */
-    protected $_backupExtension;
+    protected $backupExtension;
 
     /**
      * Resource model
      *
      * @var object
      */
-    protected $_resourceModel;
+    protected $resourceModel;
 
     /**
      * Magento's root directory
      *
      * @var string
      */
-    protected $_rootDir;
+    protected $rootDir;
 
     /**
      * Path to directory where backups stored
      *
      * @var string
      */
-    protected $_backupsDir;
+    protected $backupsDir;
 
     /**
      * Is last operation completed successfully
      *
      * @var bool
      */
-    protected $_lastOperationSucceed = false;
+    protected $lastOperationSucceed = false;
 
     /**
      * Last failed operation error message
      *
      * @var string
      */
-    protected $_lastErrorMessage;
+    protected $lastErrorMessage;
+
+    /**
+     *
+     * @var boolean
+     */
+    protected $keepSourceFile = false;
 
     /**
      * Set Backup Extension
@@ -76,7 +82,7 @@ abstract class AbstractBackup implements BackupInterface
      */
     public function setBackupExtension($backupExtension)
     {
-        $this->_backupExtension = $backupExtension;
+        $this->backupExtension = $backupExtension;
         return $this;
     }
 
@@ -87,7 +93,7 @@ abstract class AbstractBackup implements BackupInterface
      */
     public function getBackupExtension()
     {
-        return $this->_backupExtension;
+        return $this->backupExtension;
     }
 
     /**
@@ -98,7 +104,7 @@ abstract class AbstractBackup implements BackupInterface
      */
     public function setResourceModel($resourceModel)
     {
-        $this->_resourceModel = $resourceModel;
+        $this->resourceModel = $resourceModel;
         return $this;
     }
 
@@ -109,7 +115,7 @@ abstract class AbstractBackup implements BackupInterface
      */
     public function getResourceModel()
     {
-        return $this->_resourceModel;
+        return $this->resourceModel;
     }
 
     /**
@@ -120,7 +126,7 @@ abstract class AbstractBackup implements BackupInterface
      */
     public function setTime($time)
     {
-        $this->_time = $time;
+        $this->time = $time;
         return $this;
     }
 
@@ -131,7 +137,7 @@ abstract class AbstractBackup implements BackupInterface
      */
     public function getTime()
     {
-        return $this->_time;
+        return $this->time;
     }
 
     /**
@@ -149,7 +155,7 @@ abstract class AbstractBackup implements BackupInterface
             );
         }
 
-        $this->_rootDir = $rootDir;
+        $this->rootDir = $rootDir;
         return $this;
     }
 
@@ -159,7 +165,7 @@ abstract class AbstractBackup implements BackupInterface
      */
     public function getRootDir()
     {
-        return $this->_rootDir;
+        return $this->rootDir;
     }
 
     /**
@@ -170,7 +176,7 @@ abstract class AbstractBackup implements BackupInterface
      */
     public function setBackupsDir($backupsDir)
     {
-        $this->_backupsDir = $backupsDir;
+        $this->backupsDir = $backupsDir;
         return $this;
     }
 
@@ -181,7 +187,7 @@ abstract class AbstractBackup implements BackupInterface
      */
     public function getBackupsDir()
     {
-        return $this->_backupsDir;
+        return $this->backupsDir;
     }
 
     /**
@@ -222,7 +228,7 @@ abstract class AbstractBackup implements BackupInterface
      */
     public function getIsSuccess()
     {
-        return $this->_lastOperationSucceed;
+        return $this->lastOperationSucceed;
     }
 
     /**
@@ -232,7 +238,7 @@ abstract class AbstractBackup implements BackupInterface
      */
     public function getErrorMessage()
     {
-        return $this->_lastErrorMessage;
+        return $this->lastErrorMessage;
     }
 
     /**
@@ -243,7 +249,7 @@ abstract class AbstractBackup implements BackupInterface
      */
     public function setErrorMessage($errorMessage)
     {
-        $this->_lastErrorMessage = $errorMessage;
+        $this->lastErrorMessage = $errorMessage;
     }
 
     /**
@@ -256,9 +262,9 @@ abstract class AbstractBackup implements BackupInterface
     public function setName($name, $applyFilter = true)
     {
         if ($applyFilter) {
-            $name = $this->_filterName($name);
+            $name = $this->filterName($name);
         }
-        $this->_name = $name;
+        $this->name = $name;
         return $this;
     }
 
@@ -269,7 +275,7 @@ abstract class AbstractBackup implements BackupInterface
      */
     public function getName()
     {
-        return $this->_name;
+        return $this->name;
     }
 
     /**
@@ -279,7 +285,7 @@ abstract class AbstractBackup implements BackupInterface
      */
     public function getDisplayName()
     {
-        return str_replace('_', ' ', $this->_name);
+        return str_replace('_', ' ', $this->name);
     }
 
     /**
@@ -288,12 +294,29 @@ abstract class AbstractBackup implements BackupInterface
      * @param string $name
      * @return string
      */
-    protected function _filterName($name)
+    protected function filterName($name)
     {
         $name = trim(preg_replace('/[^\da-zA-Z ]/', '', $name));
         $name = preg_replace('/\s{2,}/', ' ', $name);
         $name = str_replace(' ', '_', $name);
 
         return $name;
+    }
+
+    /**
+     * Set if keep files of backup
+     *
+     * @param boolean $keepSourceFile
+     * @return $this
+     */
+    public function setKeepSourceFile($keepSourceFile)
+    {
+        $this->keepSourceFile = $keepSourceFile;
+        return $this;
+    }
+
+    public function keepSourceFile()
+    {
+        return $this->keepSourceFile;
     }
 }

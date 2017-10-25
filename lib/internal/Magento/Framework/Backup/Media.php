@@ -5,7 +5,6 @@
  */
 namespace Magento\Framework\Backup;
 
-
 /**
  * Class to work media folder and database backups
  *
@@ -21,7 +20,7 @@ class Media extends Snapshot
      */
     public function rollback()
     {
-        $this->_prepareIgnoreList();
+        $this->prepareIgnoreList();
         return parent::rollback();
     }
 
@@ -33,7 +32,7 @@ class Media extends Snapshot
      */
     public function create()
     {
-        $this->_prepareIgnoreList();
+        $this->prepareIgnoreList();
         return parent::create();
     }
 
@@ -53,7 +52,7 @@ class Media extends Snapshot
      *
      * @return $this
      */
-    protected function _prepareIgnoreList()
+    protected function prepareIgnoreList()
     {
         $rootDir = $this->getRootDir();
         $map = [

@@ -17,7 +17,7 @@ abstract class AbstractRollback
      *
      * @var \Magento\Framework\Backup\Filesystem
      */
-    protected $_snapshot;
+    protected $snapshot;
 
     /**
      * Default worker constructor
@@ -26,7 +26,7 @@ abstract class AbstractRollback
      */
     public function __construct(\Magento\Framework\Backup\Filesystem $snapshotObject)
     {
-        $this->_snapshot = $snapshotObject;
+        $this->snapshot = $snapshotObject;
     }
 
     /**

@@ -21,19 +21,19 @@ class Snapshot extends Filesystem
      *
      * @var Db
      */
-    protected $_dbBackupManager;
+    protected $dbBackupManager;
 
     /**
      * Filesystem facade
      *
      * @var AppFilesystem
      */
-    protected $_filesystem;
+    protected $filesystem;
 
     /**
      * @var Factory
      */
-    protected $_backupFactory;
+    protected $backupFactory;
 
     /**
      * @param AppFilesystem $filesystem
@@ -41,8 +41,8 @@ class Snapshot extends Filesystem
      */
     public function __construct(AppFilesystem $filesystem, Factory $backupFactory)
     {
-        $this->_filesystem = $filesystem;
-        $this->_backupFactory = $backupFactory;
+        $this->filesystem = $filesystem;
+        $this->backupFactory = $backupFactory;
     }
 
     /**
@@ -55,17 +55,17 @@ class Snapshot extends Filesystem
     {
         $result = parent::rollback();
 
-        $this->_lastOperationSucceed = false;
+        $this->lastOperationSucceed = false;
 
         try {
-            $this->_getDbBackupManager()->rollback();
+            $this->getDbBackupManager()->rollback();
         } catch (\Exception $e) {
-            $this->_removeDbBackup();
+            $this->removeDbBackup();
             throw $e;
         }
 
-        $this->_removeDbBackup();
-        $this->_lastOperationSucceed = true;
+        $this->removeDbBackup();
+        $this->lastOperationSucceed = true;
 
         return $result;
     }
@@ -78,18 +78,18 @@ class Snapshot extends Filesystem
      */
     public function create()
     {
-        $this->_getDbBackupManager()->create();
+        $this->getDbBackupManager()->create();
 
         try {
             $result = parent::create();
         } catch (\Exception $e) {
-            $this->_removeDbBackup();
+            $this->removeDbBackup();
             throw $e;
         }
 
-        $this->_lastOperationSucceed = false;
-        $this->_removeDbBackup();
-        $this->_lastOperationSucceed = true;
+        $this->lastOperationSucceed = false;
+        $this->removeDbBackup();
+        $this->lastOperationSucceed = true;
 
         return $result;
     }
@@ -110,12 +110,12 @@ class Snapshot extends Filesystem
      *
      * @return BackupInterface
      */
-    protected function _createDbBackupInstance()
+    protected function createDbBackupInstance()
     {
-        return $this->_backupFactory->create(Factory::TYPE_DB)
+        return $this->backupFactory->create(Factory::TYPE_DB)
             ->setBackupExtension('sql')
             ->setTime($this->getTime())
-            ->setBackupsDir($this->_filesystem->getDirectoryWrite(DirectoryList::VAR_DIR)->getAbsolutePath())
+            ->setBackupsDir($this->filesystem->getDirectoryWrite(DirectoryList::VAR_DIR)->getAbsolutePath())
             ->setResourceModel($this->getResourceModel());
     }
 
@@ -124,13 +124,13 @@ class Snapshot extends Filesystem
      *
      * @return Db
      */
-    protected function _getDbBackupManager()
+    protected function getDbBackupManager()
     {
-        if ($this->_dbBackupManager === null) {
-            $this->_dbBackupManager = $this->_createDbBackupInstance();
+        if ($this->dbBackupManager === null) {
+            $this->dbBackupManager = $this->createDbBackupInstance();
         }
 
-        return $this->_dbBackupManager;
+        return $this->dbBackupManager;
     }
 
     /**
@@ -141,7 +141,7 @@ class Snapshot extends Filesystem
      */
     public function setDbBackupManager(AbstractBackup $manager)
     {
-        $this->_dbBackupManager = $manager;
+        $this->dbBackupManager = $manager;
         return $this;
     }
 
@@ -152,7 +152,7 @@ class Snapshot extends Filesystem
      */
     public function getDbBackupFilename()
     {
-        return $this->_getDbBackupManager()->getBackupFilename();
+        return $this->getDbBackupManager()->getBackupFilename();
     }
 
     /**
@@ -162,7 +162,7 @@ class Snapshot extends Filesystem
      */
     protected function _removeDbBackup()
     {
-        @unlink($this->_getDbBackupManager()->getBackupPath());
+        @unlink($this->getDbBackupManager()->getBackupPath());
         return $this;
     }
 }
